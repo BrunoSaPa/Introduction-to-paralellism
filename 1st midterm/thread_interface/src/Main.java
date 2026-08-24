@@ -1,6 +1,10 @@
 import java.util.concurrent.ThreadLocalRandom;
 
-class Dog implements Runnable {
+class Animal implements Runnable {
+
+    public void sound() {
+        System.out.println("Animal sound");
+    }
 
     @Override
     public void run() {
@@ -10,9 +14,10 @@ class Dog implements Runnable {
             System.out.println(
                     "Hi, I am " + Thread.currentThread().getName()
             );
+            
+            sound();
 
             try {
-                // Random pause between 500 ms and 2000 ms
                 int pause = ThreadLocalRandom.current()
                         .nextInt(500, 2001);
 
@@ -27,29 +32,20 @@ class Dog implements Runnable {
 }
 
 
-class Cat implements Runnable {
+class Dog extends Animal {
 
     @Override
-    public void run() {
+    public void sound() {
+        System.out.println("Woof!");
+    }
+}
 
-        while (!Thread.currentThread().isInterrupted()) {
 
-            System.out.println(
-                    "Hi, I am " + Thread.currentThread().getName()
-            );
+class Cat extends Animal {
 
-            try {
-                // Random pause between 500 ms and 2000 ms
-                int pause = ThreadLocalRandom.current()
-                        .nextInt(500, 2001);
-
-                Thread.sleep(pause);
-
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
-        }
+    @Override
+    public void sound() {
+        System.out.println("Meow!");
     }
 }
 
