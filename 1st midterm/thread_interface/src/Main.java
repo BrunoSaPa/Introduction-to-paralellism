@@ -14,7 +14,7 @@ class Animal implements Runnable {
             System.out.println(
                     "Hi, I am " + Thread.currentThread().getName()
             );
-            
+
             sound();
 
             try {
