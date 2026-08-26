@@ -18,7 +18,7 @@ public class Window extends Thread {
         // window.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        window.setSize(800, 600);
+        window.setSize(400, 400);
 
         // Add label
         JLabel label = new JLabel("hee");
@@ -39,11 +39,5 @@ public class Window extends Thread {
         }
     }
 
-    public static void main(String[] args) {
-        Window window1 = new Window();
-        Window window2 = new Window();
-//        Window window3 = new Window();
-//        Window window4 = new Window();
-//        Window window5 = new Window();
-    }
 }
+
