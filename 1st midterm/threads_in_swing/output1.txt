@@ -1,0 +1,2 @@
+Value of worth of person is: 600
+Value of worth of person is: 1815
