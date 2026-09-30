@@ -1,0 +1,14 @@
+ThreadID 5:
+Paso 1: X=424, Y=60
+Paso 2: X=431, Y=59
+Paso 3: X=427, Y=57
+Paso 4: X=441, Y=63
+Paso 5: X=437, Y=67
+Paso 6: X=433, Y=71
+Paso 7: X=422, Y=57
+Paso 8: X=426, Y=50
+Paso 9: X=423, Y=47
+Paso 10: X=417, Y=47
+Paso 11: X=420, Y=33
+Paso 12: X=420, Y=36
+Paso 13: X=429, Y=36

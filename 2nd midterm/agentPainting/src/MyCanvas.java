@@ -1,47 +1,90 @@
+import javax.swing.*;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.Map;
 
+public class MyCanvas extends Canvas implements MouseListener {
+    private Graphics gall;
+    private JTextField txtThreadId;
+    private Map<Integer, Agent> agentesMap = new HashMap<>();
+    private Map<Integer, Thread> hilosMap = new HashMap<>();
+    private int contadorId = 1;
 
-public class MyCanvas extends Canvas implements MouseListener{
-    Graphics gall;
-
-    public MyCanvas(){
+    public MyCanvas(JTextField txtThreadId) {
+        this.txtThreadId = txtThreadId;
         this.setBackground(Color.GRAY);
-        //listener for the component
         this.addMouseListener(this);
     }
 
-    public void paint(Graphics g){
+    @Override
+    public void paint(Graphics g) {
         gall = g.create();
-        //g.setColor(Color.WHITE);
-        //g.fillOval(150,150,100,100);
     }
 
     @Override
-    public void mouseClicked(MouseEvent me){
-        System.out.println("Click");
-        gall.setColor(Color.RED);
-        int posX = me.getX();
-        int posY = me.getY();
+    public void mouseClicked(MouseEvent me) {
+        if (gall == null) {
+            gall = getGraphics();
+        }
 
-        gall.fillOval(posX-5,posY-5,10,10);
-        gall.setColor(Color.WHITE);
-        Agent agent = new Agent(posX,posY,gall);
-        Thread t = new Thread(agent);
-        t.start();
+        // clic izquierdo
+        if (SwingUtilities.isLeftMouseButton(me)) {
+            int id = contadorId++;
+            int posX = me.getX();
+            int posY = me.getY();
+
+            Agent agent = new Agent(id, posX, posY, gall);
+            Thread t = new Thread(agent);
+
+            agentesMap.put(id, agent);
+            hilosMap.put(id, t);
+
+            t.start();
+        }
+        //clic derecho
+        else if (SwingUtilities.isRightMouseButton(me)) {
+            matarThread();
+        }
     }
 
+    private void matarThread() {
+        if (txtThreadId == null) return;
 
-    public void mousePressed(MouseEvent me){
+        String textoInput = txtThreadId.getText().trim();
+
+        if (textoInput.isEmpty()) {
+            return;
+        }
+
+        try {
+            int idBusqueda = Integer.parseInt(textoInput);
+            Agent agente = agentesMap.get(idBusqueda);
+
+            // Validar si no existe o si ya no está activo
+            if (agente == null || !agente.isRunning()) {
+                //do something if needed, i dont want to :)
+            } else {
+                //stop agent
+                agente.stopAgent();
+
+                // Interrumpir el hilo si se encuentra en sleep
+                Thread hilo = hilosMap.get(idBusqueda);
+                if (hilo != null && hilo.isAlive()) {
+                    hilo.interrupt();
+                }
+                //thread finalizado
+            }
+        } catch (NumberFormatException e) {
+            //number not valid
+        }
     }
 
-    public void mouseReleased(MouseEvent me){}
-
-    public void mouseEntered(MouseEvent me){}
-
-    public void mouseExited(MouseEvent me){}
-
-
+    @Override public void mousePressed(MouseEvent me) {}
+    @Override public void mouseReleased(MouseEvent me) {}
+    @Override public void mouseEntered(MouseEvent me) {}
+    @Override public void mouseExited(MouseEvent me) {}
 }
