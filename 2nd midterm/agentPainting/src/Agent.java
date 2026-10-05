@@ -3,26 +3,26 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Agent implements Runnable {
     private int id;
     private int x, y;
-    private int px, py;
     private int r = 30;
-    private Graphics graph;
+    private Color color;
+    private MyCanvas canvas;
     private volatile boolean running = true;
-    private List<Point> posiciones;
+    private final List<Point> posiciones;
 
-    public Agent(int id, int x, int y, Graphics graph) {
+    public Agent(int id, int x, int y, MyCanvas canvas) {
         this.id = id;
         this.x = x;
         this.y = y;
-        this.px = x;
-        this.py = y;
-        this.graph = graph;
-        this.posiciones = new ArrayList<>();
-        this.posiciones.add(new Point(x, y));//sabe final position
+        this.canvas = canvas;
+        this.color = getRandomColor(); // Asigna un color fijo por agente
+        this.posiciones = Collections.synchronizedList(new ArrayList<>());
+        this.posiciones.add(new Point(x, y));
     }
 
     public int getId() {
@@ -37,24 +37,6 @@ public class Agent implements Runnable {
         this.running = false;
     }
 
-    private void drawCircle() {
-        if (graph == null) return;
-
-        //draw circle
-        graph.setColor(getRandomColor());
-        graph.fillOval(x, y, r, r);
-
-        //draw number
-        graph.setColor(Color.WHITE);
-        graph.setFont(new Font("Arial", Font.BOLD, 12));
-        FontMetrics fm = graph.getFontMetrics();
-        String text = String.valueOf(id);
-        int textX = x + (r - fm.stringWidth(text)) / 2;
-        int textY = y + (r + fm.getAscent() - fm.getDescent()) / 2;
-
-        graph.drawString(text, textX, textY);
-    }
-
     private Color getRandomColor() {
         int red = (int) (Math.random() * 256);
         int green = (int) (Math.random() * 256);
@@ -62,13 +44,45 @@ public class Agent implements Runnable {
         return new Color(red, green, blue);
     }
 
+    // Redibuja todos los puntos acumulados usando el contexto Graphics de paint()
+    public void redrawHistory(Graphics g) {
+        List<Point> copiaPosiciones;
+        synchronized (posiciones) {
+            copiaPosiciones = new ArrayList<>(posiciones);
+        }
+
+        for (Point p : copiaPosiciones) {
+            drawCircleAt(g, p.x, p.y);
+        }
+    }
+
+    private void drawCircleAt(Graphics g, int posX, int posY) {
+        if (g == null) return;
+
+        // Dibujar círculo
+        g.setColor(color);
+        g.fillOval(posX, posY, r, r);
+
+        // Dibujar ID del hilo
+        g.setColor(Color.WHITE);
+        g.setFont(new Font("Arial", Font.BOLD, 12));
+        FontMetrics fm = g.getFontMetrics();
+        String text = String.valueOf(id);
+        int textX = posX + (r - fm.stringWidth(text)) / 2;
+        int textY = posY + (r + fm.getAscent() - fm.getDescent()) / 2;
+
+        g.drawString(text, textX, textY);
+    }
+
     private void guardarPosicionesEnArchivo() {
         String nombreArchivo = "posiciones_thread_" + id + ".txt";
         try (PrintWriter writer = new PrintWriter(new FileWriter(nombreArchivo))) {
             writer.println("ThreadID " + id + ":");
-            for (int i = 0; i < posiciones.size(); i++) {
-                Point p = posiciones.get(i);
-                writer.println("Paso " + (i + 1) + ": X=" + p.x + ", Y=" + p.y);
+            synchronized (posiciones) {
+                for (int i = 0; i < posiciones.size(); i++) {
+                    Point p = posiciones.get(i);
+                    writer.println("Paso " + (i + 1) + ": X=" + p.x + ", Y=" + p.y);
+                }
             }
             System.out.println("Archivo '" + nombreArchivo + "' guardado correctamente.");
         } catch (IOException e) {
@@ -77,13 +91,9 @@ public class Agent implements Runnable {
     }
 
     private void work() {
-        // Dibujar posición inicial
-        drawCircle();
+        if (canvas != null) canvas.repaint();
 
         while (running) {
-            px = x;
-            py = y;
-
             int dirX = ((int) (Math.random() * 10) < 5) ? 1 : -1;
             int dirY = ((int) (Math.random() * 10) < 5) ? 1 : -1;
 
@@ -93,21 +103,21 @@ public class Agent implements Runnable {
             x += ranX;
             y += ranY;
 
-            // Registrar la nueva posición
             posiciones.add(new Point(x, y));
 
-            drawCircle();
+            // Solicita al canvas redibujar la pantalla completa
+            if (canvas != null) {
+                canvas.repaint();
+            }
 
             try {
                 Thread.sleep(250);
             } catch (InterruptedException ex) {
-                // Si se interrumpe durante el sleep, rompemos el ciclo
                 Thread.currentThread().interrupt();
                 break;
             }
         }
 
-        // create file
         guardarPosicionesEnArchivo();
     }
 
