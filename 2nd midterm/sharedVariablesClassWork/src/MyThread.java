@@ -8,8 +8,12 @@ public class MyThread extends Thread {
 
     @Override
     public void run(){
+        int executed = 0;
+
         for(int i =0; i < 1000000; i++){
-            data.increment(Thread.currentThread().getName());
+            if(data.increment()) executed ++;
+            else i--;
         }
+        System.out.println(getName() + " executed increment " + executed + " times");
     }
 }

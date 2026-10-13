@@ -1,0 +1,12 @@
+ThreadID 3:
+Paso 1: X=206, Y=141
+Paso 2: X=215, Y=134
+Paso 3: X=217, Y=141
+Paso 4: X=206, Y=142
+Paso 5: X=206, Y=148
+Paso 6: X=198, Y=142
+Paso 7: X=201, Y=153
+Paso 8: X=189, Y=148
+Paso 9: X=199, Y=143
+Paso 10: X=208, Y=134
+Paso 11: X=200, Y=131
