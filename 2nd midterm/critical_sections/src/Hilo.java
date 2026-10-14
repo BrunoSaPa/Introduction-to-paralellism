@@ -7,6 +7,10 @@ public class Hilo extends Thread {
     @Override
     public void run() {    
             for (int i = 0; i < 1000; i++) {
+                //
+//                synchronized(data){
+//                    data.incrementa();
+//                }
                 data.incrementa();
             }            
     }
