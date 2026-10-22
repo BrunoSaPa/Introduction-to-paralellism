@@ -1,6 +1,6 @@
 
 public class Main {
-    public static void main(String[] s) {
+    void main() {
         DataCenter dc = new DataCenter();
         Hilo[] hilos = new Hilo[5];
         System.out.println("Valor al comenzar: " + dc.getValor() );
